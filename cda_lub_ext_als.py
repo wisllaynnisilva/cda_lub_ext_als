@@ -153,19 +153,17 @@ df = pd.json_normalize(
 
 tb_status = pd.DataFrame(df)
 
-display(tb_status)
-
 """##**3.3.Carga no Sheets**"""
 
 # Nome da planilha
-nome_da_planilha = "cda_lub_ext_als_status"
+planilha_id = "1kYOyTVTbv8WHobnhh56F6QnW4U127ti8EiLi-TPfSiA"
 nome_da_aba = "Sheet1"
 
-# Abre a planilha
-planilha = gc.open(nome_da_planilha)
+# Abre a planilha e a aba
+planilha = gc.open_by_key(planilha_id)
 aba = planilha.worksheet(nome_da_aba)
 
-# Limpa a aba antes de escrever os dados (opcional)
+# Limpa a aba antes de escrever os dados
 aba.clear()
 
 # Envia o DataFrame para a aba
@@ -652,15 +650,10 @@ tb_results = pd.DataFrame(todos_registros)
 
 tb_results = tb_results.reindex(columns=ordem_colunas)
 
-display(tb_results)
-
-#download excel
-tb_results.to_excel("cda_lub_ext_als_results.xlsx", index=False)
-
 """##**4.3. Carga no Sheets**"""
 
 # Nome da planilha e aba
-nome_da_planilha = "cda_lub_ext_als_results"
+planilha_id = "1aSpmZ10Z_xECpfFM0oceQcJ47MLrhz4RKoizOt7QwDk"
 nome_da_aba = "Sheet1"
 
 # Se a busca não retornar dados, encerra o processo de envio
@@ -669,7 +662,7 @@ if tb_results.empty:
 
 else:
     # Abre a planilha
-    planilha = gc.open(nome_da_planilha)
+    planilha = gc.open_by_key(planilha_id)
     aba = planilha.worksheet(nome_da_aba)
 
     # Lê os dados atuais da planilha como DataFrame
