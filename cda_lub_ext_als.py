@@ -16,11 +16,8 @@ import requests
 import datetime
 import pandas as pd
 import urllib.request
-# from pyspark.sql import SparkSession # Removed Spark import
-#from pyspark.sql.functions import col # Removed Spark import
 from concurrent.futures import ThreadPoolExecutor
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
-#from pyspark.sql.types import StructType, StructField, StringType, FloatType # Removed Spark import
 
 """# **2. DADOS DE ACESSO**
 
@@ -28,8 +25,8 @@ from gspread_dataframe import get_as_dataframe, set_with_dataframe
 """
 
 credentials = {
-        "username": "wisllaynni.silva@samprojetos.com",
-        "password": "eioa85lq"
+        "username": os.getenv("S360_USERNAME"),
+        "password": os.getenv("S360_PASSWORD")
     }
 
 """## **2.2. URL's**"""
@@ -79,11 +76,19 @@ header = {
 from google.colab import auth
 from google.auth import default
 
-# Autentica no Google
-auth.authenticate_user()
+# Lê a variável de ambiente com o conteúdo do JSON da conta de serviço
+service_account_info = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT"])
 
-# Use 'default' para pegar as credenciais no formato esperado pelo gspread
-creds, _ = default()
+# Define os escopos de acesso (Google Sheets)
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
+
+# Cria as credenciais usando o conteúdo do secret
+creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
+
+# Autentica no Google Sheets
 gc = gspread.authorize(creds)
 
 """#**3. STATUS DE AMOSTRAS**
