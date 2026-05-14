@@ -6,12 +6,14 @@
 
 import json
 import time
-import gspread
 import requests
 import datetime
 import pandas as pd
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+
+import gspread
+from google.oauth2.service_account import Credentials
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 
 """# **2. DADOS DE ACESSO**
@@ -67,9 +69,6 @@ header = {
 
 ###**2.5.1. Autenticação no Sheets**
 """
-
-from google.colab import auth
-from google.auth import default
 
 # Lê a variável de ambiente com o conteúdo do JSON da conta de serviço
 service_account_info = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT"])
