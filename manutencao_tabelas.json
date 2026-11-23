@@ -7,6 +7,9 @@
     "chaves": [
       "sampleNumber"
     ],
-    "coluna_tempo_esperada": "resultDate"
+    "coluna_tempo_esperada": "resultDate",
+    "correcao": {
+      "so_aparar_grade": true
+    }
   }
 }
