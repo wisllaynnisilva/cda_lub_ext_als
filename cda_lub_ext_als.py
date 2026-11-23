@@ -33,6 +33,10 @@ URL_SAMPLERESULTS = f"{URL_BASE}/api/v1/sampleResult/search"
 
 PAUSA_ENTRE_PAGINAS = 25   # segundos (limite de requisições da ALS)
 
+# Tabela histórica (323 colunas): ao passar deste nº de linhas, o arquivo é
+# arquivado como '<nome> revNNN' e a planilha ativa recomeça vazia.
+LIMITE_LINHAS = {"results": 15_000}
+
 PLANILHAS = {
     "status": "1kYOyTVTbv8WHobnhh56F6QnW4U127ti8EiLi-TPfSiA",
     "results": "1aSpmZ10Z_xECpfFM0oceQcJ47MLrhz4RKoizOt7QwDk",
@@ -206,7 +210,10 @@ def etapa_results():
     # Antes: se o cabeçalho da planilha fosse diferente, a aba era APAGADA e
     # ficava só com os dados de ontem. Agora as linhas são alinhadas pelo
     # cabeçalho existente e apenas sampleNumber novos são anexados.
-    anexar_novos(PLANILHAS["results"], df, chaves=["sampleNumber"], nome="results")
+    anexar_novos(
+        PLANILHAS["results"], df, chaves=["sampleNumber"], nome="results",
+        limite_linhas=LIMITE_LINHAS["results"],
+    )
     return df
 
 
