@@ -1,0 +1,12 @@
+{
+  "status": {
+    "id": "1kYOyTVTbv8WHobnhh56F6QnW4U127ti8EiLi-TPfSiA"
+  },
+  "results": {
+    "id": "1aSpmZ10Z_xECpfFM0oceQcJ47MLrhz4RKoizOt7QwDk",
+    "chaves": [
+      "sampleNumber"
+    ],
+    "coluna_tempo_esperada": "resultDate"
+  }
+}
