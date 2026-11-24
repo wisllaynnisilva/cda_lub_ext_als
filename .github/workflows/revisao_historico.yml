@@ -1,0 +1,36 @@
+name: revisao_historico
+
+# Revisão SOMENTE LEITURA: compara todo o histórico da API da ALS com a
+# planilha de resultados. Não grava nada. Só roda manualmente.
+on:
+  workflow_dispatch:
+    inputs:
+      ano_inicial:
+        description: 'Ano inicial da busca na API'
+        required: false
+        default: '2015'
+
+concurrency:
+  group: revisao_historico
+  cancel-in-progress: false
+
+jobs:
+  revisao:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Revisão do histórico
+        env:
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          ALS_USERNAME: ${{ secrets.ALS_USERNAME }}
+          ALS_PASSWORD: ${{ secrets.ALS_PASSWORD }}
+          ALS_URL: ${{ secrets.ALS_URL }}
+          ANO_INICIAL: ${{ inputs.ano_inicial }}
+          PYTHONUNBUFFERED: '1'
+        run: python revisar_historico.py
