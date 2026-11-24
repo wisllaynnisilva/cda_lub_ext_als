@@ -10,6 +10,7 @@ Etapas (isoladas):
 """
 
 from concurrent.futures import ThreadPoolExecutor
+import re
 import time
 
 import pandas as pd
@@ -174,6 +175,22 @@ def processar_linha(linha):
     return base
 
 
+_PARECE_DATA = re.compile(r"^\s*\d{1,4}[/-]\d{1,2}([/-]\d{1,4})?\s*$")
+_COLUNAS_DATA = {"resultDate", "receiptDate", "registrationDate", "dateSampled"}
+
+
+def proteger_texto(df):
+    """Códigos como a Classe ISO '16/12/9' eram convertidos em data pelo
+    Sheets (USER_ENTERED). O apóstrofo faz o Sheets guardar o texto como veio."""
+    for col in df.columns:
+        if col in _COLUNAS_DATA:
+            continue
+        df[col] = df[col].map(
+            lambda v: f"'{v.strip()}" if isinstance(v, str) and _PARECE_DATA.match(v) else v
+        )
+    return df
+
+
 def etapa_results():
     dia = dia_referencia().isoformat()
     log.info("Resultados de %s", dia)
@@ -206,6 +223,7 @@ def etapa_results():
         log.warning("Testes novos fora da lista de colunas (ignorados): %s", desconhecidas)
     df = df.reindex(columns=ORDEM_COLUNAS)
     df["sampleNumber"] = df["sampleNumber"].astype(str)
+    df = proteger_texto(df)
 
     # Antes: se o cabeçalho da planilha fosse diferente, a aba era APAGADA e
     # ficava só com os dados de ontem. Agora as linhas são alinhadas pelo
