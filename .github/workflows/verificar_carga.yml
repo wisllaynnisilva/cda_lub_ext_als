@@ -1,0 +1,41 @@
+name: verificar_carga
+
+# Conferência SOMENTE LEITURA, coluna a coluna, da planilha de resultados
+# contra a API da ALS. Não grava nada. Só roda manualmente.
+on:
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: 'Dias a conferir, AAAA-MM-DD separados por vírgula (vazio = todo o histórico, ~2h)'
+        required: false
+        default: ''
+      ano_inicial:
+        description: 'Ano inicial quando dias estiver vazio'
+        required: false
+        default: '2021'
+
+concurrency:
+  group: verificar_carga
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Conferência coluna a coluna
+        env:
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          ALS_USERNAME: ${{ secrets.ALS_USERNAME }}
+          ALS_PASSWORD: ${{ secrets.ALS_PASSWORD }}
+          ALS_URL: ${{ secrets.ALS_URL }}
+          DIAS: ${{ inputs.dias }}
+          ANO_INICIAL: ${{ inputs.ano_inicial }}
+          PYTHONUNBUFFERED: '1'
+        run: python verificar_carga.py
