@@ -1,0 +1,44 @@
+name: atualizar_reemitidas
+
+# Atualiza na própria linha as amostras que a ALS reemitiu/corrigiu depois de
+# gravadas (a carga diária grava cada amostra uma vez só). Guarda as linhas
+# antigas na aba 'backup_reemitidas_AAAAMMDD'. Roda todo dia 1 e manualmente.
+on:
+  schedule:
+    - cron: '41 10 1 * *'   # dia 1, 07:41 de Brasília
+  workflow_dispatch:
+    inputs:
+      aplicar:
+        description: 'sim = grava na planilha; nao = só mostra o que mudaria'
+        required: false
+        default: 'sim'
+      dias:
+        description: 'Só estes dias de resultado, AAAA-MM-DD separados por vírgula (vazio = todo o histórico, ~2h)'
+        required: false
+        default: ''
+
+concurrency:
+  group: atualizar_reemitidas
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Atualizar amostras reemitidas
+        env:
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          ALS_USERNAME: ${{ secrets.ALS_USERNAME }}
+          ALS_PASSWORD: ${{ secrets.ALS_PASSWORD }}
+          ALS_URL: ${{ secrets.ALS_URL }}
+          APLICAR: ${{ inputs.aplicar || 'sim' }}
+          DIAS: ${{ inputs.dias }}
+          PYTHONUNBUFFERED: '1'
+        run: python atualizar_reemitidas.py
